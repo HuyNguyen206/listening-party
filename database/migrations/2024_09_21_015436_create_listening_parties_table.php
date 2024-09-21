@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignIdFor(\App\Models\Episode::class)->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->dateTime('start_time');
-            $table->dateTime('end_time');
+            $table->dateTime('end_time')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
