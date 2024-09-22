@@ -18,6 +18,6 @@ class Episode extends Model
 
     public function podcast(): BelongsTo
     {
-        return $this->belongsTo(Postcast::class);
+        return $this->belongsTo(Podcast::class);
     }
 }

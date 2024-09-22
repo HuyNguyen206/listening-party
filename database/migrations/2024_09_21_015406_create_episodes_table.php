@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('episodes', function (Blueprint $table) {
             $table->id();
-            $table->foreignIdFor(\App\Models\Postcast::class)->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignIdFor(\App\Models\Podcast::class)->nullable()->constrained()->cascadeOnDelete();
             $table->string('title')->nullable();
             $table->string('media_url');
             $table->timestamps();
