@@ -20,4 +20,9 @@ class ListeningParty extends Model
     {
         return $this->belongsTo(Episode::class);
     }
+
+//    public function podcast(): HasOneThrough
+//    {
+//        return $this->hasOneThrough(Podcast::class, Episode::class, 'id', 'id', 'episode_id', 'podcast_id');
+//    }
 }
