@@ -20,7 +20,12 @@ new class extends Component {
     public function with()
     {
         return [
-            'listeningParties' => ListeningParty::query()->where('is_active', true)->with('episode.podcast')->orderBy('start_time')->get()
+            'listeningParties' => ListeningParty::query()
+                ->where('is_active', true)
+                ->whereNotNull('end_time')
+                ->with('episode.podcast')
+                ->orderBy('start_time')
+                ->get()
         ];
     }
 
@@ -35,6 +40,7 @@ new class extends Component {
             'start_time' => $this->startTime,
         ]);
         dispatch(new ProcessPodcastUrl($mediaUrl, $listeningParty, $episode));
+
         return redirect(route('parties.show', $listeningParty));
     }
 }; ?>
@@ -66,13 +72,13 @@ new class extends Component {
                 @forelse($listeningParties as $listeningParty)
                     <div wire:key="{{$listeningParty->id}}">
                         <a href="{{route('parties.show', $listeningParty)}}">
-                            <div class="flex space-x-4 items-center justify-between p-4 border-b border-gray-200 hover:bg-emerald-50 transition">
+                            <div class="flex space-x-2 md:flex-row flex-col items-center justify-between p-4 border-b border-gray-200 hover:bg-emerald-50 transition">
                                 <div class="flex-shrink-0">
                                     <x-avatar src="{{$listeningParty->episode->podcast->artwork_url}}" size="xl" rounded="full"/>
                                 </div>
                                 <div class="flex-1">
                                     <p class="text-[0.9rem] font-semibold truncate text-slate-900">{{$listeningParty->name}}</p>
-                                    <p class="text-sm font-semibold truncate text-slate-400">{{$listeningParty->episode->title}}</p>
+                                    <p class="text-sm max-w-xs font-semibold truncate text-slate-400">{{$listeningParty->episode->title}}</p>
                                     <p class="tracking-tighter uppercase text-[0.7rem] text-slate-500">{{$listeningParty->episode->podcast->title}}</p>
                                     <div class="mt-2" x-data="{
                                         startTime: '{{ $listeningParty->start_time->toIso8601String() }}',
@@ -118,7 +124,7 @@ new class extends Component {
 
                     </div>
                 @empty
-                    <div>No awwdio listening parties started yet... 😿</div>
+                    <div class="flex text-center p-4 font-serif justify-center">No awwdio listening parties started yet... 😿</div>
                 @endforelse
             </div>
         </div>
