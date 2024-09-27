@@ -66,7 +66,7 @@ new class extends Component {
                 @forelse($listeningParties as $listeningParty)
                     <div wire:key="{{$listeningParty->id}}">
                         <a href="{{route('parties.show', $listeningParty)}}">
-                            <div class="flex space-x-4 items-center justify-between p-4 border-b border-gray-200 hover:bg-emerald-300 transition">
+                            <div class="flex space-x-4 items-center justify-between p-4 border-b border-gray-200 hover:bg-emerald-50 transition">
                                 <div class="flex-shrink-0">
                                     <x-avatar src="{{$listeningParty->episode->podcast->artwork_url}}" size="xl" rounded="full"/>
                                 </div>
@@ -74,9 +74,45 @@ new class extends Component {
                                     <p class="text-[0.9rem] font-semibold truncate text-slate-900">{{$listeningParty->name}}</p>
                                     <p class="text-sm font-semibold truncate text-slate-400">{{$listeningParty->episode->title}}</p>
                                     <p class="tracking-tighter uppercase text-[0.7rem] text-slate-500">{{$listeningParty->episode->podcast->title}}</p>
-                                    <p class="text-xs mt-2">{{$listeningParty->start_time}}</p>
-                                </div>
+                                    <div class="mt-2" x-data="{
+                                        startTime: '{{ $listeningParty->start_time->toIso8601String() }}',
+                                        countdownText: '',
+                                        isLive: {{$listeningParty->start_time->isPast() && $listeningParty->is_active ? 'true' : 'false'}},
+                                        updateCountdown(){
+                                            const start = (new Date(this.startTime)).getTime();
+                                            const now = (new Date()).getTime();
+                                            const distance = start - now;
+                                              console.log(distance, start, now)
 
+                                            if (distance < 0) {
+                                                this.countdownText = 'Started';
+                                                this.isLive = true;
+                                            } else {
+                                                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                                                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                                                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                                                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                                                console.log(distance, hours, minutes, seconds)
+                                                this.countdownText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                                            }
+                                        }
+                                    }" x-init="updateCountdown(); setInterval(() => updateCountdown(), 1000)">
+                                        <div x-show="isLive">
+                                            <x-badge flat rose label="Live">
+                                                <x-slot name="prepend" class="relative flex items-center w-2 h-2">
+        <span
+            class="absolute inline-flex w-full h-full rounded-full opacity-75 bg-cyan-500 animate-ping"></span>
+
+                                                    <span class="relative inline-flex w-2 h-2 rounded-full bg-rose-500"></span>
+                                                </x-slot>
+                                            </x-badge>
+                                        </div>
+                                        <div x-show="!isLive" class="text-green-700 text-sm" >
+                                            Starts in: <span x-text="countdownText"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <x-button flat sm class="w-20">Join</x-button>
                             </div>
                         </a>
 
