@@ -9,6 +9,8 @@
 
         <!-- Styles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <link rel="preconnect" href="https://fonts.bunny.net">
+        <link href="https://fonts.bunny.net/css?family=figtree:400,600|aleo:300,400|annie-use-your-telescope:400&display=swap" rel="stylesheet" />
     </head>
     <body>
         {{ $slot }}
