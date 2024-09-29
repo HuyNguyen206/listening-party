@@ -83,6 +83,7 @@ new class extends Component {
                                     <div class="mt-2" x-data="{
                                         startTime: '{{ $listeningParty->start_time->timestamp }}',
                                         countdownText: '',
+                                        isActive: {{ $listeningParty->is_active ? 'true' : 'false'}},
                                         isLive: {{$listeningParty->start_time->isPast() && $listeningParty->is_active ? 'true' : 'false'}},
                                         updateCountdown(){
                                             const now = Math.floor(Date.now() / 1000);
@@ -105,14 +106,20 @@ new class extends Component {
                                         }
                                     }" x-init="updateCountdown(); setInterval(() => updateCountdown(), 1000)">
                                         <div x-show="isLive">
-                                            <x-badge flat rose label="Live">
-                                                <x-slot name="prepend" class="relative flex items-center w-2 h-2">
+                                            <div x-show="isActive">
+                                                <x-badge flat rose label="Live">
+                                                    <x-slot name="prepend" class="relative flex items-center w-2 h-2">
         <span
             class="absolute inline-flex w-full h-full rounded-full opacity-75 bg-cyan-500 animate-ping"></span>
 
-                                                    <span class="relative inline-flex w-2 h-2 rounded-full bg-rose-500"></span>
-                                                </x-slot>
-                                            </x-badge>
+                                                        <span class="relative inline-flex w-2 h-2 rounded-full bg-rose-500"></span>
+                                                    </x-slot>
+                                                </x-badge>
+                                            </div>
+                                            <div x-show="!isActive" class="text-slate-600 font-bold">
+                                                The podcast has finished
+                                            </div>
+
                                         </div>
                                         <div x-show="!isLive" class="text-green-700 text-sm" >
                                             Starts in: <span x-text="countdownText"></span>
