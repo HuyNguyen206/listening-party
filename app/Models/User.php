@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
@@ -43,5 +44,16 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function avatar()
+    {
+        $initials = collect(explode(' ', $this->name))
+            ->map(function ($word) {
+                return Str::upper(Str::substr($word, 0, 1));
+            })
+            ->implode('');
+
+        return "https://via.placeholder.com/150.png?text=$initials";
     }
 }

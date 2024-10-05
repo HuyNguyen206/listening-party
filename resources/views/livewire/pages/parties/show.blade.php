@@ -3,14 +3,52 @@
 use Livewire\Volt\Component;
 
 new class extends Component {
+
+    #[\Livewire\Attributes\Validate('required|string|max:255')]
+    public $message = '';
+
     public \App\Models\ListeningParty $listeningParty;
 
     public function mount(\App\Models\ListeningParty $listeningParty)
     {
         $this->listeningParty = $listeningParty->load('episode.podcast');
     }
+
+    public function with()
+    {
+        return [
+            'messages' => $this->listeningParty->messages()->with('user')->oldest()->get()
+        ];
+    }
+
+    public function sendMessages()
+    {
+        if (auth()->guest()) {
+            session()->push('auth_redirect', route('parties.show', $this->listeningParty));
+
+            return $this->redirect(route('login'));
+        }
+
+        $this->validate();
+        $this->listeningParty->messages()->create([
+            'user_id' => auth()->id(),
+            'message' => $this->message,
+        ]);
+        event(new \App\Events\NewMessageEvent(listeningPartyId: $this->listeningParty->id, message: $this->message));
+
+        $this->message = '';
+    }
+
+    public function getListeners()
+    {
+        return [
+            'echo:listening-party.{listeningParty.id},NewMessageEvent' => 'refresh'
+        ];
+    }
+
 }; ?>
-    <div class="min-h-screen bg-emerald-50 flex items-center justify-center" x-data="{
+<div class="grid grid-cols-2 gap-x-2 bg-emerald-50 py-5">
+    <div class="min-h-screen flex items-start justify-center" x-data="{
             audio: null,
             isLoading: true,
             isLive: false,
@@ -217,5 +255,38 @@ new class extends Component {
                 </div>
             @endif
         </div>
-
     </div>
+
+    <div class="min-h-screen flexitems-start justify-center">
+        <div class="w-full min-h-96 max-w-3xl p-8 bg-white rounded-lg shadow-lg flex flex-col">
+            @forelse($messages as $message)
+                    <div class="text-gray-600 text-sm flex space-x-2 items-center justify-start my-4">
+                        <img class="object-cover h-10 w-10 rounded-full" src="{{$message->user->avatar()}}" alt="user avatar">
+                        <span class="font-bold">{{ $message->user->name }}:</span>
+
+                        {{ $message->message }}
+                    </div>
+                @empty
+                <p>
+                    No message
+                </p>
+            @endforelse
+            <div class="flex space-x-2">
+                @auth
+                    <input class="border-gray-200 rounded-lg shadow w-full" type="text" placeholder="Message" wire:model="message"  wire:keydown.prevent.enter="sendMessages">
+                @endauth
+                    <x-button sm class="w-40" wire:click.prevent="sendMessages">
+                        @auth
+                        Send message
+                        @else
+                        Login
+                        @endauth
+                    </x-button>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
