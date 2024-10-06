@@ -13,6 +13,8 @@
         <link href="https://fonts.bunny.net/css?family=figtree:400,600|aleo:300,400|annie-use-your-telescope:400&display=swap" rel="stylesheet" />
     </head>
     <body>
-        {{ $slot }}
+    <livewire:layout.navigation/>
+
+    {{ $slot }}
     </body>
 </html>

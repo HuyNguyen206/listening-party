@@ -345,11 +345,13 @@ new class extends Component {
                     <img class="object-cover h-10 w-10 rounded-full" src="{{$message->user->avatar()}}"
                          alt="user avatar">
                     <span class="font-bold">{{ $message->user->name }}:</span>
+                    <p class="ml-3">
+                        {{ $message->message }}
 
-                    {{ $message->message }}
+                    </p>
                 </div>
             @empty
-                <p>
+                <p class="my-4">
                     No message
                 </p>
             @endforelse
